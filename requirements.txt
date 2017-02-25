@@ -1,0 +1,10 @@
+future==0.16.0
+Gutenberg==0.4.5
+isodate==0.5.4
+pyparsing==2.1.10
+rdflib==4.2.2
+rdflib-sqlalchemy==0.2.dev0
+requests==2.13.0
+six==1.10.0
+SQLAlchemy==1.1.5
+wheel==0.26.0
