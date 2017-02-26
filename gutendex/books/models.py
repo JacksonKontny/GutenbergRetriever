@@ -6,6 +6,9 @@ class Author(models.Model):
     death_year = models.SmallIntegerField(blank=True, null=True)
     name = models.CharField(max_length=128)
 
+    def __str__(self):
+        return self.name
+
 
 class Book(models.Model):
     authors = models.ManyToManyField('Author')
@@ -21,9 +24,15 @@ class Book(models.Model):
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)
 
+    def __str__(self):
+        return self.title
+
 
 class Bookshelf(models.Model):
     name = models.CharField(max_length=64, unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Format(models.Model):
@@ -35,6 +44,13 @@ class Format(models.Model):
 class Language(models.Model):
     code = models.CharField(max_length=4, unique=True)
 
+    def __str__(self):
+        return self.code
+
 
 class Subject(models.Model):
     name = models.CharField(max_length=256)
+
+    def __str__(self):
+        return self.name
+
