@@ -16,6 +16,7 @@ class Book(models.Model):
     media_type = models.CharField(max_length=16)
     subjects = models.ManyToManyField('Subject')
     title = models.CharField(blank=True, max_length=1024, null=True)
+    text = models.TextField(blank=True)
 
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)
