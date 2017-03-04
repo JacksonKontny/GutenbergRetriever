@@ -1,6 +1,9 @@
 import xml.etree.ElementTree as parser
 import os
 import re
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from collections import Counter
 
 
 LINE_BREAK_PATTERN = re.compile(r'[ \t]*[\n\r]+[ \t]*')
@@ -129,3 +132,21 @@ def get_book(id, xml_file_path):
 def safe_unicode(arg, *args, **kwargs):
     """ Coerce argument to Unicode if it's not already. """
     return arg if isinstance(arg, str) else str(arg, *args, **kwargs)
+
+def get_word_count(text):
+    for punc in string.punctuation:
+        text = text.replace(punc, ' ')
+
+    words = text.strip().split()
+
+    stemmed_words = []
+    for w in words:
+        try:
+            w = ps.stem(w)
+            if w.lower() not in stop_words and w.isalpha():
+                stemmed_words.append(w)
+        except IndexError:
+            continue
+
+    counter = Counter(stemmed_words)
+

@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.db.models import Q
+from django.views.generic import TemplateView
 
 from rest_framework import viewsets
 from rest_framework.response import Response
 
 from .models import *
 from .serializers import *
+from .forms import QueryForm
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -95,3 +97,15 @@ class SubjectViewSet(viewsets.ModelViewSet):
     """ This is an API endpoint that allows book subjects to be viewed. """
     queryset = Subject.objects.all().order_by('name')
     serializer_class = SubjectSerializer
+
+def get_relevant_books(query):
+
+
+class QueryView(TemplateView):
+    def get():
+        pass
+
+    def post(self, query):
+        form = QueryForm(self.request.POST)
+        if form.is_valid():
+            relevant_books = get_relevant_books(form.query)

@@ -67,7 +67,7 @@ class Posting(models.Model):
         return self.tf * self.token.idf
 
 class Token(models.Model):
-    name = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=128, unique=True)
     df = models.PositiveIntegerField(default=0)
     total_occurances = models.PositiveIntegerField(default=0)
 
