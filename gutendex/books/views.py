@@ -5,6 +5,8 @@ from django.views.generic import TemplateView
 from rest_framework import viewsets
 from rest_framework.response import Response
 
+from books import utils
+
 from .models import *
 from .serializers import *
 from .forms import QueryForm
@@ -98,8 +100,10 @@ class SubjectViewSet(viewsets.ModelViewSet):
     queryset = Subject.objects.all().order_by('name')
     serializer_class = SubjectSerializer
 
-def get_relevant_books(query):
 
+def get_relevant_books(query):
+    counter = utils.get_word_count(query)
+    tokens = Token.objects.filter(name__in=counter.keys())
 
 class QueryView(TemplateView):
     def get():
