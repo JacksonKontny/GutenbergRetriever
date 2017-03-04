@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as parser
 import os
 import re
+import string
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from collections import Counter
@@ -134,6 +135,8 @@ def safe_unicode(arg, *args, **kwargs):
     return arg if isinstance(arg, str) else str(arg, *args, **kwargs)
 
 def get_word_count(text):
+    stop_words = set(stopwords.words("english"))
+    ps = PorterStemmer()
     for punc in string.punctuation:
         text = text.replace(punc, ' ')
 
@@ -148,5 +151,5 @@ def get_word_count(text):
         except IndexError:
             continue
 
-    counter = Counter(stemmed_words)
+    return Counter(stemmed_words)
 
