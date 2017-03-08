@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as parser
+import math
 import os
 import re
 import string
@@ -152,4 +153,16 @@ def get_word_count(text):
             continue
 
     return Counter(stemmed_words)
+
+def get_magnitude(vector):
+    """ Return the magnitude of a vector, the square root of the sum of the
+        squares
+    """
+    return math.sqrt(
+        sum(
+            [term**2 for term in vector]
+        )
+    )
+
+
 

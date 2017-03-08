@@ -2,6 +2,8 @@ from django.db import models
 
 import math
 
+from books import utils
+
 
 class Author(models.Model):
     birth_year = models.SmallIntegerField(blank=True, null=True)
@@ -23,6 +25,45 @@ class Book(models.Model):
     title = models.CharField(blank=True, max_length=1024, null=True)
     text = models.TextField(blank=True)
     is_parsed = models.BooleanField(default=False)
+
+    def magnitude(self):
+        """ Get the magnitude of this book's term vector
+
+            Magnitude is the sum of the squares of all terms that belong to
+            this book.
+        """
+        return utils.get_magnitude(self.posting.values_list('tf', flat=True))
+
+    def query_dot_product(self, query, transformation=None):
+        """ Get the dot product of the input query and this book's term
+            frequency vector
+        """
+        # If no transformation offered, just return the same value as passed in
+        if not transformation:
+            transformation = lambda x: x
+
+        # query = transformation(query)
+
+        # obtain this document's postings that pertain to query tokens
+        postings = self.posting.objects.filter(token__name__in=query.keys())
+        dot_product = 0
+        for posting in postings:
+            dot_product += posting.tf * query[posting.token.name]
+        return dot_product
+
+    def cosine_distance(self, query, transformation=None):
+        """ Return the cosine distance between a query and the book's term
+            frequency vector.
+
+            Cosine distance is the dot product of the query and the book
+            divided by the product of the magnitude of the query and the book
+        """
+
+        return (
+            self.query_dot_product(query, transformation=transformation)
+            /
+            self.magnitude * utils.get_magnitude(query.values())
+        )
 
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)

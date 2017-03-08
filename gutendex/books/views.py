@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db.models import Q
-from django.views.generic import TemplateView
+from django.shortcuts import render
+from django.views import View
 
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -100,16 +101,29 @@ class SubjectViewSet(viewsets.ModelViewSet):
     queryset = Subject.objects.all().order_by('name')
     serializer_class = SubjectSerializer
 
-
-def get_relevant_books(query):
+def get_ranked_books(query):
     counter = utils.get_word_count(query)
-    tokens = Token.objects.filter(name__in=counter.keys())
+    postings = Posting.objects.filter(token__name__in=counter.keys())
 
-class QueryView(TemplateView):
-    def get():
-        pass
+    # only get books that have at least one of the terms queried
+    books = Book.objects.filter(posting__in=postings)
 
-    def post(self, query):
+    # get cosine distane for every book
+    rated_books = [(book, book.cosine_distance(query)) for book in books]
+
+    # sort by the cosine distance, lowest to highest
+    ranked_books = sorted(rated_books, key=lambda x: x[1])
+
+    return [rank_tuple[0] for rank_tuple in ranked_books][:10]
+
+class QueryView(View):
+    form_class = QueryForm
+    template_name = 'query.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {'form': self.form_class()})
+
+    def post(self, request, query):
         form = QueryForm(self.request.POST)
         if form.is_valid():
-            relevant_books = get_relevant_books(form.query)
+            relevant_books = get_ranked_books(form.query)
