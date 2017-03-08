@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
+from django.urls import reverse
 
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -109,7 +111,7 @@ def get_ranked_books(query):
     books = Book.objects.filter(posting__in=postings)
 
     # get cosine distane for every book
-    rated_books = [(book, book.cosine_distance(query)) for book in books]
+    rated_books = [(book.pk, book.cosine_distance(counter)) for book in books]
 
     # sort by the cosine distance, lowest to highest
     ranked_books = sorted(rated_books, key=lambda x: x[1])
@@ -123,7 +125,34 @@ class QueryView(View):
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, {'form': self.form_class()})
 
-    def post(self, request, query):
+    def post(self, request, *args, **kwargs):
         form = QueryForm(self.request.POST)
         if form.is_valid():
-            relevant_books = get_ranked_books(form.query)
+            query = form.cleaned_data['query']
+            relevant_books = get_ranked_books(query)
+            self.request.session['books'] = relevant_books
+            return HttpResponseRedirect(
+                reverse('books:ranked-list')
+            )
+        else:
+            return self.get(request, *args, **kwargs)
+
+class ListView(View):
+    template_name = 'ranked-list.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            self.template_name,
+            {'books': Book.objects.filter(pk__in=self.request.session['books'])}
+        )
+
+class DetailView(View):
+    template_name = 'book-text.html'
+
+    def get(self, request, pk, *args, **kwargs):
+        return render(
+            request,
+            self.template_name,
+            {'text': Book.objects.get(pk=pk).text}
+        )

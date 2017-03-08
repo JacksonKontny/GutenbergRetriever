@@ -13,7 +13,6 @@ class Author(models.Model):
     def __str__(self):
         return self.name
 
-
 class Book(models.Model):
     authors = models.ManyToManyField('Author')
     bookshelves = models.ManyToManyField('Bookshelf')
@@ -26,13 +25,16 @@ class Book(models.Model):
     text = models.TextField(blank=True)
     is_parsed = models.BooleanField(default=False)
 
+    @property
     def magnitude(self):
         """ Get the magnitude of this book's term vector
 
             Magnitude is the sum of the squares of all terms that belong to
             this book.
         """
-        return utils.get_magnitude(self.posting.values_list('tf', flat=True))
+        return utils.get_magnitude(
+            self.posting_set.values_list('tf', flat=True)
+        )
 
     def query_dot_product(self, query, transformation=None):
         """ Get the dot product of the input query and this book's term
@@ -45,7 +47,9 @@ class Book(models.Model):
         # query = transformation(query)
 
         # obtain this document's postings that pertain to query tokens
-        postings = self.posting.objects.filter(token__name__in=query.keys())
+        postings = self.posting_set.filter(
+            token__name__in=query.keys()
+        )
         dot_product = 0
         for posting in postings:
             dot_product += posting.tf * query[posting.token.name]

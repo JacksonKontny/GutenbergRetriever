@@ -1,0 +1,5 @@
+{% for book in books %}
+<li><a href="{% url 'books:text' pk=book.pk %}">
+        {{ book.title }}
+    </a></li>
+{% endfor %}
