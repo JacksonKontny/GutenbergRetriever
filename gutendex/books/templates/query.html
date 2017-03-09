@@ -1,3 +1,10 @@
+{% if form.errors %}
+    <ol>
+    {% for error in form.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+    {% endfor %}
+    </ol>
+{% endif %}
 <form action={% url "books:query" %} method="post">
     {% csrf_token %}
     {{ form }}
