@@ -123,7 +123,11 @@ class QueryView(View):
     template_name = 'query.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'form': self.form_class()})
+        return render(
+            request,
+            self.template_name,
+            {'form': self.form_class()},
+        )
 
     def post(self, request, *args, **kwargs):
         form = QueryForm(self.request.POST)
@@ -144,7 +148,7 @@ class ListView(View):
         return render(
             request,
             self.template_name,
-            {'books': Book.objects.filter(pk__in=self.request.session['books'])}
+            {'books': Book.objects.filter(pk__in=self.request.session['books'])},
         )
 
 class DetailView(View):
