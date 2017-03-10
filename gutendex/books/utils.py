@@ -171,7 +171,7 @@ def get_mean(vector):
 
 def get_std(vector):
     """ Return the standard deviation (float) of the input vecotr """
-    sum_of_square_of_diff = sum(([term - get_mean(vector))**2 for term in vector])
+    sum_of_square_of_diff = sum([(term - get_mean(vector))**2 for term in vector])
     return math.sqrt(sum_of_square_of_diff/float(len(vector)))
 
 def get_corr(vector1, vector2):
