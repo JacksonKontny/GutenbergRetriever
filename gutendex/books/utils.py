@@ -158,11 +158,9 @@ def get_magnitude(vector):
     """ Return the magnitude of a vector, the square root of the sum of the
         squares
     """
-    return math.sqrt(
-        sum(
-            [term**2 for term in vector]
-        )
-    )
+    return math.sqrt(get_sum_of_squares(vector))
 
-
-
+def get_sum_of_squares(vector):
+    """ Return the sum of the square of all terms in the input vector
+    """
+    return sum([term**2 for term in vector])

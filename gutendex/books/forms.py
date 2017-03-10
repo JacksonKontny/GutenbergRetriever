@@ -4,7 +4,8 @@ class QueryForm(forms.Form):
 
     DISTANCE_METRICS = (
         ("0", "Cosine Distance"),
-        ("1", "Jaccard"),
+        ("1", "Jaccard Distance"),
+        ("2", "Dice Coefficient"),
     )
 
     query = forms.CharField(label='Query', max_length=300)

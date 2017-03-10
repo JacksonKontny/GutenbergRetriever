@@ -26,6 +26,14 @@ class Book(models.Model):
     is_parsed = models.BooleanField(default=False)
 
     @property
+    def sum_of_squares(self):
+        """ Get the sum of the squared terms
+        """
+        return utils.get_sum_of_squares(
+            self.posting_set.values_list('tf', flat=True)
+        )
+
+    @property
     def magnitude(self):
         """ Get the magnitude of this book's term vector
 
@@ -59,14 +67,53 @@ class Book(models.Model):
         """ Return the cosine distance between a query and the book's term
             frequency vector.
 
-            Cosine distance is the dot product of the query and the book
-            divided by the product of the magnitude of the query and the book
+            Dices coefficient is two times the dot product of the query and the
+            book divided by the sum of the squared terms of each book
         """
 
         return (
             self.query_dot_product(query, transformation=transformation)
             /
             self.magnitude * utils.get_magnitude(query.values())
+        )
+
+    def jaccard_distance(self, query, transformation=None):
+        """ Return the jaccard distance between a query and the book's term
+            frequency vector.
+
+            jaccard distance is the dot product of the query and the book
+            divided by the sum of all squared terms in both the query and the
+            book minus the original dot product
+
+            jaccard =
+            dot(query, book)
+            /
+            ((sum of book squared terms + sum of query squared terms) - dot(query, book))
+        """
+        dot_product = self.query_dot_product(query, transformation=transformation)
+        return(
+            dot_product
+            /
+            self.sum_of_squares + utils.get_sum_of_squares(query.values()) - dot_product
+        )
+
+    def dice_coefficient(self, query, transformation=None):
+        """ Return the dice coefficient between a query and the book's term
+            frequency vector.
+
+            the Dice coefficient is 2 times the dot product of the query and the book
+            divided by the sum of all squared terms in both the query and the book
+
+            Dice =
+            2 * dot(query, book)
+            /
+            (sum of book squared terms + sum of query squared terms)
+        """
+        dot_product = self.query_dot_product(query, transformation=transformation)
+        return(
+            2 * dot_product
+            /
+            self.sum_of_squares + utils.get_sum_of_squares(query.values())
         )
 
     def get_formats(self):
