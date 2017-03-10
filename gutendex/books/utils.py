@@ -6,7 +6,7 @@ import string
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from collections import Counter
-
+from decimal import Decimal
 
 LINE_BREAK_PATTERN = re.compile(r'[ \t]*[\n\r]+[ \t]*')
 NAMESPACES = {
@@ -132,7 +132,7 @@ def get_book(id, xml_file_path):
 
 
 def safe_unicode(arg, *args, **kwargs):
-    """ Coerce argument to Unicode if it's not already. """
+    """ Coerce argument to Unicode if it's not already """
     return arg if isinstance(arg, str) else str(arg, *args, **kwargs)
 
 def get_word_count(text):
@@ -154,13 +154,61 @@ def get_word_count(text):
 
     return Counter(stemmed_words)
 
+def get_sum_of_squares(vector):
+    """ Return the sum of the square of all terms in the input vector
+    """
+    return sum([term**2 for term in vector])
+
 def get_magnitude(vector):
     """ Return the magnitude of a vector, the square root of the sum of the
         squares
     """
     return math.sqrt(get_sum_of_squares(vector))
 
-def get_sum_of_squares(vector):
-    """ Return the sum of the square of all terms in the input vector
+def get_mean(vector):
+    """ Return the mean (float) of all terms in the input vector """
+    return float(sum(vector))/float(len(vector))
+
+def get_std(vector):
+    """ Return the standard deviation (float) of the input vecotr """
+    sum_of_square_of_diff = sum(([term - get_mean(vector))**2 for term in vector])
+    return math.sqrt(sum_of_square_of_diff/float(len(vector)))
+
+def get_corr(vector1, vector2):
+    """ Return the correlation (float) of the input vectors """
+
+    if len(vector1) != len(vector2):
+        raise Exception("Input vectors have to be the same size.")
+
+    n = len(vector1)
+
+    sum_xy = 0
+    for i in range(n):
+        if vector1[i] != 0 and vector2[i] != 0:
+            sum_xy += vector1[i] * vector2[i]
+
+    n_xmean_y_mean = n * get_mean(vector1) * get_mean(vector2)
+    x_std = get_std(vector1)
+    y_std = get_std(vector2)
+
+    return (sum_xy - n_xmean_y_mean) / (x_std * y_std * (n -1))
+
+def get_minkowski(vector1, vector2, power):
+    """ Return the minkowski distance between the input vectors
+        power = 1: manhattan
+        power = 2: euclidean
+        power = inf: chebyshev
+        more: https://en.wikipedia.org/wiki/Minkowski_distance
     """
-    return sum([term**2 for term in vector])
+
+    def nth_root(value, n_root):
+        root_value = 1 / float(n_root)
+        return Decimal(value) ** Decimal(root_value)
+
+    if len(vector1) != len(vector2):
+        raise Exception("Input vectors have to be the same size.")
+    elif power < 1:
+        raise ValueError("p must be at least 1")
+
+    return nth_root(sum(pow(abs(a - b), power) for a, b in zip(vector1, vector2)), power)
+
