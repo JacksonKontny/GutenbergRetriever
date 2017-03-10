@@ -174,22 +174,25 @@ def get_std(vector):
     sum_of_square_of_diff = sum([(term - get_mean(vector))**2 for term in vector])
     return math.sqrt(sum_of_square_of_diff/float(len(vector)))
 
-def get_corr(vector1, vector2, n):
+def get_corr(vector1, vector2):
     """ Return the correlation (float) of the input vectors """
 
     if len(vector1) != len(vector2):
         raise Exception("Input vectors have to be the same size.")
 
+    x_mean = get_mean(vector1)
+    y_mean = get_mean(vector2)
+
+    n = len(vector1)
+
     sum_xy = 0
     for i in range(n):
-        if vector1[i] != 0 and vector2[i] != 0:
-            sum_xy += vector1[i] * vector2[i]
+        sum_xy += (vector1[i]-x_mean) * (vector2[i]-y_mean)
 
-    n_xmean_y_mean = n * get_mean(vector1) * get_mean(vector2)
     x_std = get_std(vector1)
     y_std = get_std(vector2)
 
-    return 1 - (sum_xy - n_xmean_y_mean) / (x_std * y_std * (n - 1))
+    return 1 - (sum_xy/(x_std*y_std))/(n - 1)
 
 def get_minkowski(vector1, vector2, power):
     """ Return the minkowski distance between the input vectors
