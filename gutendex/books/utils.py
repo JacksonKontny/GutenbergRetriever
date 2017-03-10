@@ -191,7 +191,7 @@ def get_corr(vector1, vector2):
     x_std = get_std(vector1)
     y_std = get_std(vector2)
 
-    return (sum_xy - n_xmean_y_mean) / (x_std * y_std * (n -1))
+    return 1 - (sum_xy - n_xmean_y_mean) / (x_std * y_std * (n -1))
 
 def get_minkowski(vector1, vector2, power):
     """ Return the minkowski distance between the input vectors
