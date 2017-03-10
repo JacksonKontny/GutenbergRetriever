@@ -25,10 +25,10 @@ class Book(models.Model):
     text = models.TextField(blank=True)
     is_parsed = models.BooleanField(default=False)
     euclidian_sim = models.ManyToManyField('self', through='Euclidean',
-                                           symmetrical=True,
+                                           symmetrical=False,
                                            related_name='euclidean_of')
     correlation_sim = models.ManyToManyField('self', through='Correlation',
-                                             symmetrical=True,
+                                             symmetrical=False,
                                              related_name='correlation_of')
 
     @property
