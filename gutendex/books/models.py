@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.postgres.fields import HStoreField
 import math
 
 from books import utils
@@ -24,6 +24,12 @@ class Book(models.Model):
     title = models.CharField(blank=True, max_length=1024, null=True)
     text = models.TextField(blank=True)
     is_parsed = models.BooleanField(default=False)
+    euclidian_sim = models.ManyToManyField('self', through='Euclidean',
+                                           symmetrical=True,
+                                           related_name='euclidean_of')
+    correlation_sim = models.ManyToManyField('self', through='Correlation',
+                                             symmetrical=True,
+                                             related_name='correlation_of')
 
     @property
     def sum_of_squares(self):
@@ -169,3 +175,13 @@ class Token(models.Model):
 
     def __str__(self):
         return self.name
+
+class Euclidean(models.Model):
+    book_1 = models.ForeignKey('Book', related_name='book1_euc')
+    book_2 = models.ForeignKey('Book', related_name='book2_euc')
+    euclidean = models.FloatField(default=0)
+
+class Correlation(models.Model):
+    book_1 = models.ForeignKey('Book', related_name='book1_corr')
+    book_2 = models.ForeignKey('Book', related_name='book2_corr')
+    correlation = models.FloatField(default=0)

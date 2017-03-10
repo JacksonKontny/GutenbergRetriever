@@ -65,8 +65,6 @@ def _etextno_to_uri_subdirectory(etextno):
     subdir = "{0}/{1}".format(subdir_part, etextno)  # etextno not zfilled
     return subdir
 
-
-
 class Command(BaseCommand):
     help = 'This replaces the catalog files with the latest ones.'
 
