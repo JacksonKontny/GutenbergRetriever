@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.postgres.fields import HStoreField
 import math
 
+from scipy.spatial.distance import cosine
+
 from books import utils
 
 
@@ -29,7 +31,7 @@ class Book(models.Model):
     euclidian_sim = models.ManyToManyField('self', through='Euclidean',
                                            symmetrical=False,
                                            related_name='euclidean_of')
-    correlation_sim = models.ManyToManyFiegti ld('self', through='Correlation',
+    correlation_sim = models.ManyToManyField('self', through='Correlation',
                                              symmetrical=False,
                                              related_name='correlation_of')
 
@@ -84,19 +86,34 @@ class Book(models.Model):
             dot_product += posting.tf * query[posting.token.name]
         return dot_product
 
-    def cosine_distance(self, query, transformation=None):
+    def cosine_distance(self, query, transformation='tfidf'):
         """ Return the cosine distance between a query and the book's term
             frequency vector.
 
             Dices coefficient is two times the dot product of the query and the
             book divided by the sum of the squared terms of each book
         """
-
-        return 1 - (
-            self.query_dot_product(query, transformation=transformation)
-            /
-            self.magnitude * utils.get_magnitude(query.values())
+        query_postings = self.posting_set.filter(
+            token__name__in=query.keys()
         )
+        if transformation == 'tfidf':
+            # Multiply query tf by idf of token
+            for posting in query_postings:
+                token_name = posting.token.name
+                query[token_name] = query[token_name] * posting.token.idf
+
+            # Get vector of query ordered by token name
+            query_vector = [x[1] for x in sorted(query.items())]
+            book_vector = [
+                x.tfidf for x in query_postings.order_by('token__name')
+            ]
+        else:
+            query_vector = [x[1] for x in sorted(query.items())]
+            book_vector = query_postings.order_by(
+                'token__name'
+            ).values_list('tf', flat=True)
+
+        return 1 - cosine(query_vector, book_vector)
 
     def jaccard_distance(self, query, transformation=None):
         """ Return the jaccard distance between a query and the book's term

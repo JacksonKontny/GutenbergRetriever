@@ -8,6 +8,8 @@ from nltk.stem import PorterStemmer
 from collections import Counter
 from decimal import Decimal
 
+from books import models
+
 LINE_BREAK_PATTERN = re.compile(r'[ \t]*[\n\r]+[ \t]*')
 NAMESPACES = {
     'dc': 'http://purl.org/dc/terms/',
@@ -213,7 +215,7 @@ def get_minkowski(vector1, vector2, power):
 
     return nth_root(sum(pow(abs(a - b), power) for a, b in zip(vector1, vector2)), power)
 
-def get_sparse_vector(self, postings_list):
+def get_sparse_vector(postings_list):
     """ Takes a postings dictionary of {pk: value} pairs and returns a sparse
         vector for all tokens
     """
@@ -224,3 +226,17 @@ def get_sparse_vector(self, postings_list):
     for pk, value in postings_list.iteritems():
         sparse_dict[pk] = value
 
+def create_postings(book, counter):
+    for word, count in counter.items():
+        token, created = models.Token.objects.get_or_create(
+            name=word
+        )
+        token.total_occurances += count
+        token.df += 1
+        token.save()
+
+        models.Posting.objects.create(
+            book=book,
+            token=token,
+            tf = count,
+        )
