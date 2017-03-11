@@ -29,7 +29,7 @@ class Book(models.Model):
     euclidian_sim = models.ManyToManyField('self', through='Euclidean',
                                            symmetrical=False,
                                            related_name='euclidean_of')
-    correlation_sim = models.ManyToManyFiegti ld('self', through='Correlation',
+    correlation_sim = models.ManyToManyField('self', through='Correlation',
                                              symmetrical=False,
                                              related_name='correlation_of')
 
@@ -136,9 +136,6 @@ class Book(models.Model):
             /
             self.sum_of_squares + utils.get_sum_of_squares(query.values())
         )
-
-    def pearson_correlation(self, query, transformation=None):
-        return
 
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)
