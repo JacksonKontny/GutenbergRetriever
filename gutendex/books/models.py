@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.db import models
 from django.contrib.postgres.fields import HStoreField
 import math
@@ -24,6 +25,19 @@ class Book(models.Model):
     title = models.CharField(blank=True, max_length=1024, null=True)
     text = models.TextField(blank=True)
     is_parsed = models.BooleanField(default=False)
+
+    @property
+    def sparse_tfidf_vector(self):
+        """ Return this book's sparse term frequency vector
+        """
+        sparse_dict = OrderedDict(
+            zip(Token.objects.values_list('pk', flat=True),
+                [0]*Token.objects.count())
+        )
+        for posting in self.posting_set.all().select_related('token'):
+            sparse_dict[posting.token.pk] = posting.tfidf
+
+        return [x[1] for x in sparse_dict.items()]
 
     @property
     def sum_of_squares(self):
@@ -116,6 +130,9 @@ class Book(models.Model):
             self.sum_of_squares + utils.get_sum_of_squares(query.values())
         )
 
+    def pearson_correlation(self, query, transformation=None):
+        return
+
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)
 
@@ -169,3 +186,4 @@ class Token(models.Model):
 
     def __str__(self):
         return self.name
+

@@ -10,6 +10,7 @@ from books import views as book_views
 app_name="books"
 urlpatterns = [
     url(r'^query/$', book_views.QueryView.as_view(), name='query'),
+    url(r'^recommend/$', book_views.RecommendView.as_view(), name='recommend'),
     url(r'^ranked-list/$', book_views.ListView.as_view(), name='ranked-list'),
     url(r'^text/(?P<pk>\d+)$', book_views.DetailView.as_view(), name='text'),
 ]
