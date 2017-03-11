@@ -154,9 +154,6 @@ class Book(models.Model):
             self.sum_of_squares + utils.get_sum_of_squares(query.values())
         )
 
-    def pearson_correlation(self, query, transformation=None):
-        return
-
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)
 
