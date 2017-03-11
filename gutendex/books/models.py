@@ -1,8 +1,7 @@
 from collections import OrderedDict
 from django.db import models
-from django.contrib.postgres.fields import HStoreField
-import math
 
+import math
 from books import utils
 
 
@@ -136,9 +135,6 @@ class Book(models.Model):
             /
             self.sum_of_squares + utils.get_sum_of_squares(query.values())
         )
-
-    def pearson_correlation(self, query, transformation=None):
-        return
 
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)
