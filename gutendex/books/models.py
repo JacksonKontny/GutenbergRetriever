@@ -92,7 +92,7 @@ class Book(models.Model):
             book divided by the sum of the squared terms of each book
         """
 
-        return (
+        return 1 - (
             self.query_dot_product(query, transformation=transformation)
             /
             self.magnitude * utils.get_magnitude(query.values())
@@ -112,7 +112,7 @@ class Book(models.Model):
             ((sum of book squared terms + sum of query squared terms) - dot(query, book))
         """
         dot_product = self.query_dot_product(query, transformation=transformation)
-        return(
+        return 1 - (
             dot_product
             /
             self.sum_of_squares + utils.get_sum_of_squares(query.values()) - dot_product
@@ -131,7 +131,7 @@ class Book(models.Model):
             (sum of book squared terms + sum of query squared terms)
         """
         dot_product = self.query_dot_product(query, transformation=transformation)
-        return(
+        return 1 - (
             2 * dot_product
             /
             self.sum_of_squares + utils.get_sum_of_squares(query.values())
