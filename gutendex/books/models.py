@@ -29,7 +29,7 @@ class Book(models.Model):
     euclidian_sim = models.ManyToManyField('self', through='Euclidean',
                                            symmetrical=False,
                                            related_name='euclidean_of')
-    correlation_sim = models.ManyToManyField('self', through='Correlation',
+    correlation_sim = models.ManyToManyFiegti ld('self', through='Correlation',
                                              symmetrical=False,
                                              related_name='correlation_of')
 
