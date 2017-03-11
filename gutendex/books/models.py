@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.db import models
 from django.contrib.postgres.fields import HStoreField
 import math
@@ -24,12 +25,26 @@ class Book(models.Model):
     title = models.CharField(blank=True, max_length=1024, null=True)
     text = models.TextField(blank=True)
     is_parsed = models.BooleanField(default=False)
+    tokens = models.ManyToManyField('Token', through='Posting')
     euclidian_sim = models.ManyToManyField('self', through='Euclidean',
                                            symmetrical=False,
                                            related_name='euclidean_of')
     correlation_sim = models.ManyToManyField('self', through='Correlation',
                                              symmetrical=False,
                                              related_name='correlation_of')
+
+    @property
+    def sparse_tfidf_vector(self):
+        """ Return this book's sparse term frequency vector
+        """
+        sparse_dict = OrderedDict(
+            zip(Token.objects.values_list('pk', flat=True),
+                [0]*Token.objects.count())
+        )
+        for posting in self.posting_set.all().select_related('token'):
+            sparse_dict[posting.token.pk] = posting.tfidf
+
+        return [x[1] for x in sparse_dict.items()]
 
     @property
     def sum_of_squares(self):
@@ -122,6 +137,9 @@ class Book(models.Model):
             self.sum_of_squares + utils.get_sum_of_squares(query.values())
         )
 
+    def pearson_correlation(self, query, transformation=None):
+        return
+
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)
 
@@ -177,11 +195,11 @@ class Token(models.Model):
         return self.name
 
 class Euclidean(models.Model):
-    book_1 = models.ForeignKey('Book', related_name='book1_euc')
-    book_2 = models.ForeignKey('Book', related_name='book2_euc')
-    euclidean = models.FloatField(default=0)
+    book_1 = models.ForeignKey('Book', related_name='book1_euc+')
+    book_2 = models.ForeignKey('Book', related_name='book2_euc+')
+    distance = models.FloatField(default=0)
 
 class Correlation(models.Model):
-    book_1 = models.ForeignKey('Book', related_name='book1_corr')
-    book_2 = models.ForeignKey('Book', related_name='book2_corr')
-    correlation = models.FloatField(default=0)
+    book_1 = models.ForeignKey('Book', related_name='book1_corr+')
+    book_2 = models.ForeignKey('Book', related_name='book2_corr+')
+    distance = models.FloatField(default=0)

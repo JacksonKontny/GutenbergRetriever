@@ -12,7 +12,7 @@ from books import utils
 
 from .models import *
 from .serializers import *
-from .forms import QueryForm
+from .forms import QueryForm, RecommendForm
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -108,6 +108,8 @@ def get_ranked_books(query, distance_metric):
         '0': 'cosine_distance',
         '1': 'jaccard_distance',
         '2': 'dice_coefficient',
+        '3': 'pearson_correlation',
+        '4': 'euclidean_distance',
     }
     counter = utils.get_word_count(query)
     postings = Posting.objects.filter(token__name__in=counter.keys())
@@ -127,6 +129,34 @@ def get_ranked_books(query, distance_metric):
     ranked_books = sorted(rated_books, key=lambda x: x[1])
 
     return [rank_tuple[0] for rank_tuple in ranked_books][:10]
+
+class RecommendView(View):
+    form_class = RecommendForm
+    template_name = 'recommend.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            self.template_name,
+            {'form': self.form_class()},
+        )
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(self.request.POST)
+        if form.is_valid():
+            book = form.cleaned_data['book']
+            top_correlations = (
+                Correlation.objects.filter(book_1=book).order_by('distance')
+            )[:10]
+            relevant_books = [
+                correlation.book_2.pk for correlation in top_correlations
+            ]
+            self.request.session['books'] = relevant_books
+            return HttpResponseRedirect(
+                reverse('books:ranked-list')
+            )
+        else:
+            return self.get(request, *args, **kwargs)
 
 class QueryView(View):
     form_class = QueryForm
