@@ -250,7 +250,6 @@ def get_transformed_vector(query_postings, query, transformation):
         query_vector, book_vector = (
             get_binary_vectors(query_postings, query)
         )
-
     else:
         query_vector, book_vector = (
             get_tf_vectors(query_postings, query)
@@ -271,13 +270,15 @@ def get_tfidf_vectors(query_postings, query):
     return query_vector, book_vector
 
 def get_tf_vectors(query_postings, query):
-    book_vector = query_postings.order_by(
+    ordered_postings = query_postings.order_by(
         'token__name'
-    ).values_list('tf', flat=True)
-    query_vector = [x[1] for x in sorted(query.items()) if x[1] in book_vector]
+    )
+    book_vector = ordered_postings.values_list('tf', flat=True)
+    book_terms = ordered_postings.values_list('token__name', flat=True)
+    query_vector = [x[1] for x in sorted(query.items()) if x[0] in book_terms]
     return query_vector, book_vector
 
 def get_binary_vectors(query_postings, _):
     book_vector_length = query_postings.count()
-    book_vector, query_vector = [1] * book_vector_length
+    book_vector = query_vector = [1] * book_vector_length
     return query_vector, book_vector

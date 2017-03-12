@@ -95,7 +95,7 @@ class Book(models.Model):
         """
         query_postings = self.posting_set.filter(
             token__name__in=query.keys()
-        )
+        ).distinct()
         query_vector, book_vector = utils.get_transformed_vector(
             query_postings, query, transformation
         )
