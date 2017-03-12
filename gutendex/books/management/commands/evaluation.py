@@ -44,6 +44,7 @@ class Command(BaseCommand):
 
                         for distance_key, distance_name in metric_mapping.items():
                             for trans_key, trans_name in transformation_mapping.items():
+
                                 rank = get_ranked_books(
                                     query,
                                     distance_key,
