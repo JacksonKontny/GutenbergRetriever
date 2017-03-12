@@ -107,7 +107,7 @@ class Book(models.Model):
             query_postings, query, transformation
         )
 
-        return 1 - cosine(query_vector, book_vector)
+        return cosine(query_vector, book_vector)
 
     def jaccard_distance(self, query, transformation='tfidf'):
         """ Return the jaccard distance between a query and the book's term
@@ -128,7 +128,7 @@ class Book(models.Model):
         query_vector, book_vector = utils.get_transformed_vector(
             query_postings, query, transformation
         )
-        return 1 - jaccard(query_vector, book_vector)
+        return jaccard(query_vector, book_vector)
 
     def dice_distance(self, query, transformation='tfidf'):
         """ Return the dice coefficient between a query and the book's term
@@ -192,6 +192,11 @@ class Posting(models.Model):
     def tfidf(self):
         return self.tf * self.token.idf
 
+    class Meta:
+        unique_together = (
+            ('book', 'token'),
+        )
+
 class Token(models.Model):
     name = models.CharField(max_length=128, unique=True)
     df = models.PositiveIntegerField(default=0)
@@ -209,6 +214,16 @@ class Distance(models.Model):
     book_2 = models.ForeignKey('Book', related_name='book2_distance+')
     distance = models.FloatField(default=0)
     distance_type = models.ForeignKey('DistanceType')
+
+    def __str__(self):
+        return '{} - {}, {}: {}'.format(
+            self.book_1, self.book_2, self.distance_type, self.distance
+        )
+
+    class Meta:
+        unique_together = (
+            ('book_1', 'book_2', 'distance_type'),
+        )
 
 class DistanceType(models.Model):
     COSINE='cosine'
