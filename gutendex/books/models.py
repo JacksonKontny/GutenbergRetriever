@@ -28,12 +28,9 @@ class Book(models.Model):
     text = models.TextField(blank=True)
     is_parsed = models.BooleanField(default=False)
     tokens = models.ManyToManyField('Token', through='Posting')
-    euclidian_sim = models.ManyToManyField('self', through='Euclidean',
+    distance = models.ManyToManyField('self', through='Distance',
                                            symmetrical=False,
-                                           related_name='euclidean_of')
-    correlation_sim = models.ManyToManyField('self', through='Correlation',
-                                             symmetrical=False,
-                                             related_name='correlation_of')
+                                           related_name='distance_to')
 
     @property
     def sparse_tfidf_vector(self):
@@ -47,6 +44,16 @@ class Book(models.Model):
             sparse_dict[posting.token.pk] = posting.tfidf
 
         return [x[1] for x in sparse_dict.items()]
+
+    @property
+    def tfidf_dict(self):
+        """ Return this book's sparse term frequency vector
+        """
+        posting_dict = {}
+        for posting in self.posting_set.all().select_related('token'):
+            posting_dict[posting.token.pk] = posting.tfidf
+
+        return posting_dict
 
     @property
     def sum_of_squares(self):
@@ -123,7 +130,7 @@ class Book(models.Model):
         )
         return 1 - jaccard(query_vector, book_vector)
 
-    def dice_coefficient(self, query, transformation='tfidf'):
+    def dice_distance(self, query, transformation='tfidf'):
         """ Return the dice coefficient between a query and the book's term
             frequency vector.
 
@@ -196,6 +203,22 @@ class Token(models.Model):
 
     def __str__(self):
         return self.name
+
+class Distance(models.Model):
+    book_1 = models.ForeignKey('Book', related_name='book1_distance+')
+    book_2 = models.ForeignKey('Book', related_name='book2_distance+')
+    distance = models.FloatField(default=0)
+    distance_type = models.ForeignKey('DistanceType')
+
+class DistanceType(models.Model):
+    COSINE='cosine'
+    EUCLIDEAN='euclidean'
+    PEARSON='pearson'
+    JACCARD='jaccard'
+    DICE='dice'
+
+    code = models.CharField(max_length=64)
+    name = models.CharField(max_length=64)
 
 class Euclidean(models.Model):
     book_1 = models.ForeignKey('Book', related_name='book1_euc+')
