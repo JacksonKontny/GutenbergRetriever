@@ -59,7 +59,6 @@ class Command(BaseCommand):
                                 result = [query_number]
                                 result.extend(documents)
                                 csvs[csv_name].append(result)
-                        break
 
                     query_lines = []
                     query_number += 1
