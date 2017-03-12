@@ -1,12 +1,10 @@
 from collections import OrderedDict
 from django.db import models
 
-<<<<<<< HEAD
 import math
-=======
+
 from scipy.spatial.distance import cosine, jaccard, dice
 
->>>>>>> book_rec
 from books import utils
 
 

@@ -5,6 +5,7 @@
     {% endfor %}
     </ol>
 {% endif %}
+
 <form action={% url "books:query" %} method="post">
     {% csrf_token %}
     <table>

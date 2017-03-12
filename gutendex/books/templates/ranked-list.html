@@ -1,3 +1,5 @@
+{% block nav-home %}<a href="{% url 'books:query' %}">Home</a>{% endblock %}
+
 {% for book in books %}
 <li><a href="{% url 'books:text' pk=book.pk %}">
         {{ book.title }}
