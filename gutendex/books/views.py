@@ -103,7 +103,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
     queryset = Subject.objects.all().order_by('name')
     serializer_class = SubjectSerializer
 
-def get_ranked_books(query, distance_metric, transformation):
+def get_ranked_books(query, distance_metric, transformation, limit=10):
     metric_mapping = {
         '0': 'cosine_distance',
         '1': 'jaccard_distance',
@@ -131,7 +131,7 @@ def get_ranked_books(query, distance_metric, transformation):
     # sort by the cosine distance, lowest to highest
     ranked_books = sorted(rated_books, key=lambda x: x[1])
 
-    return [rank_tuple[0] for rank_tuple in ranked_books][:10]
+    return [rank_tuple[0] for rank_tuple in ranked_books][:limit]
 
 class RecommendView(View):
     form_class = RecommendForm
