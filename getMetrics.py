@@ -16,11 +16,14 @@ def getMetrics(f1, f2 = 'Time_REL.csv'):
     groundTruth.close()
     retrieved.close()
 
-    precision = []
-    recall = []
-    f_measure = []
+    all_precision = []
+    all_recall = []
+    all_f_measure = []
 
     for i in range(len(groundTruth)): # number of queries
+        precision = []
+        recall = []
+        f_measure = []
 
         temp_precision = []
         temp_recall = []
@@ -43,4 +46,15 @@ def getMetrics(f1, f2 = 'Time_REL.csv'):
         recall.append(get_average(temp_recall))
         f_measure.append(get_average(f_measure))
 
-    return precision, recall, f_measure
+    all_precision.append(precision)
+    all_recall.append(recall)
+    all_f_measure(f_measure)
+
+    output = open('Evals.csv', 'w')
+
+    for i in range(len(all_precision)):
+        output.write(str(i+1) + ',' + ','.join(str(j) for j in all_precision[i]))
+        output.write(str(i+1) + ',' + ','.join(str(j) for j in all_recall[i]))
+        output.write(str(i+1) + ',' + ','.join(str(j) for j in all_f_measure[i]))
+
+    output.close()
