@@ -123,8 +123,9 @@ def get_ranked_books(query, distance_metric, transformation, limit=10):
     rated_books = [
         (
             book.pk,
-            getattr(book, metric_mapping[distance_metric])(counter),
-            transformation_mapping[transformation] # calls book.<distance_metric>, which could be cosine, jaccard, or dice
+            getattr(
+                book, metric_mapping[distance_metric]
+            )(counter, transformation=transformation_mapping[transformation]),
          ) for book in books
     ]
 
