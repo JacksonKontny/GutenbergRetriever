@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 from books import models, utils
 
 from scipy.stats import pearsonr
-from scipy.spatial.distance import euclidean
+from scipy.spatial.distance import cosine, jaccard, dice, euclidean
 
 
 def _db_handle(*args, **options):
@@ -16,36 +16,98 @@ def _db_handle(*args, **options):
             queryset=models.Posting.objects.select_related('token')
         )
     )
-    big_dict = {}
+    tfidf_dict = {}
     for idx, book in enumerate(books):
-        big_dict[book.pk] = book.sparse_tfidf_vector
+        tfidf_dict[book.pk] = book.sparse_tfidf_vector
         print("On book {}".format(idx))
-    book_pks = books.values_list('pk', flat=True)
+    book_pks = [x for x in tfidf_dict.keys()]
     for idx, i in enumerate(book_pks):
+        book_i_vector = tfidf_dict[i]
+        book_i = models.Book.objects.get(pk=i)
         for j in book_pks[idx+1:]:
-            # Correlation is same in both directions
-            correlation = pearsonr(big_dict[i], big_dict[j])[0]
-            models.Correlation.objects.update_or_create(
-                book_1=models.Book.objects.get(pk=i),
-                book_2=models.Book.objects.get(pk=j),
-                distance=1-correlation
+            book_j_vector = tfidf_dict[j]
+            book_j = models.Book.objects.get(pk=j)
+            pearson_distance = 1 - pearsonr(book_i_vector, book_j_vector)[0]
+            euclidean_distance = euclidean(book_i_vector, book_j_vector)
+            cosine_distance = 1 - cosine(book_i_vector, book_j_vector)
+            jaccard_distance = 1 - jaccard(book_i_vector, book_j_vector)
+            dice_distance = 1 - dice(book_i_vector, book_j_vector)
+            euclidean_type = models.DistanceType.objects.get(
+                code=models.DistanceType.EUCLIDEAN
             )
-            models.Correlation.objects.update_or_create(
-                book_2=models.Book.objects.get(pk=i),
-                book_1=models.Book.objects.get(pk=j),
-                distance=1-correlation
+            models.Distance.objects.update_or_create(
+                book_1=book_i,
+                book_2=book_j,
+                distance_type=euclidean_type,
+                defaults={'distance': euclidean_distance},
             )
-            euclidean_d = euclidean(big_dict[i], big_dict[j])
-            models.Euclidean.objects.update_or_create(
-                book_1=models.Book.objects.get(pk=i),
-                book_2=models.Book.objects.get(pk=j),
-                distance=euclidean_d
+            models.Distance.objects.update_or_create(
+                book_1=book_j,
+                book_2=book_i,
+                distance_type=euclidean_type,
+                defaults={'distance': euclidean_distance},
             )
-            models.Euclidean.objects.update_or_create(
-                book_2=models.Book.objects.get(pk=i),
-                book_1=models.Book.objects.get(pk=j),
-                distance=euclidean_d
+            pearson_type = models.DistanceType.objects.get(
+                code=models.DistanceType.PEARSON
             )
+            models.Distance.objects.update_or_create(
+                book_1=book_i,
+                book_2=book_j,
+                distance_type=pearson_type,
+                defaults={'distance': pearson_distance},
+            )
+            models.Distance.objects.update_or_create(
+                book_1=book_j,
+                book_2=book_i,
+                distance_type=pearson_type,
+                defaults={'distance': pearson_distance},
+            )
+            cosine_type = models.DistanceType.objects.get(
+                code=models.DistanceType.COSINE
+            )
+            models.Distance.objects.update_or_create(
+                book_1=book_i,
+                book_2=book_j,
+                distance_type=cosine_type
+            )
+            models.Distance.objects.update_or_create(
+                book_1=book_j,
+                book_2=book_i,
+                distance_type=cosine_type,
+                defaults={'distance': cosine_distance},
+            )
+            jaccard_type = models.DistanceType.objects.get(
+                code=models.DistanceType.JACCARD
+            )
+            models.Distance.objects.update_or_create(
+                book_1=book_i,
+                book_2=book_j,
+                distance_type=jaccard_type,
+                defaults={'distance': jaccard_distance},
+            )
+            models.Distance.objects.update_or_create(
+                book_1=book_j,
+                book_2=book_i,
+                distance_type=jaccard_type,
+                defaults={'distance': jaccard_distance},
+            )
+            dice_type = models.DistanceType.objects.get(
+                code=models.DistanceType.DICE
+            )
+            models.Distance.objects.update_or_create(
+                book_1=book_i,
+                book_2=book_j,
+                distance_type=dice_type,
+                defaults={'distance': dice_distance},
+            )
+            models.Distance.objects.update_or_create(
+                book_1=book_j,
+                book_2=book_i,
+                distance_type=dice_type,
+                defaults={'distance': dice_distance},
+            )
+            print(i, j)
+
 
 
 class Command(BaseCommand):

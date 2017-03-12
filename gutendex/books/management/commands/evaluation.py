@@ -21,7 +21,7 @@ class Command(BaseCommand):
         metric_mapping = {
             '0': 'cosine_distance',
             '1': 'jaccard_distance',
-            '2': 'dice_coefficient',
+            '2': 'dice_distance',
         }
         transformation_mapping = {
             '0': 'tfidf',
