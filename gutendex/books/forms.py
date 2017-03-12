@@ -6,8 +6,6 @@ DISTANCE_METRICS = (
     ("0", "Cosine Distance"),
     ("1", "Jaccard Distance"),
     ("2", "Dice Coefficient"),
-    ("3", "Pearson Correlation"),
-    ("4", "Euclidean Distance"),
 )
 VECTOR_TRANSFORMATIONS = (
     ("0", "TF-IDF"),
@@ -17,7 +15,8 @@ VECTOR_TRANSFORMATIONS = (
 
 class QueryForm(forms.Form):
 
-    query = forms.CharField(label='Query', max_length=300)
+    query = forms.CharField(label='Query', max_length=300,
+                            widget=forms.TextInput(attrs={'size': 50}))
     distance_metric = forms.ChoiceField(
         choices=DISTANCE_METRICS,
         initial="0",

@@ -108,8 +108,6 @@ def get_ranked_books(query, distance_metric, transformation):
         '0': 'cosine_distance',
         '1': 'jaccard_distance',
         '2': 'dice_coefficient',
-        '3': 'pearson_correlation',
-        '4': 'euclidean_distance',
     }
     transformation_mapping = {
         '0': 'tfidf',
