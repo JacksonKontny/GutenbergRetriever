@@ -1,4 +1,4 @@
-CSC 575 Readme
+Gutenberg Retriever
 ==============
 
 This project is a prototype information retrieval system and item based recommender system for
