@@ -240,3 +240,34 @@ def create_postings(book, counter):
             token=token,
             tf = count,
         )
+
+def get_transformed_vector(query_postings, query, transformation):
+    if transformation == 'tfidf':
+        query_vector, book_vector = get_tfidf_vectors(
+            query_postings, query
+        )
+    else:
+        query_vector, book_vector = (
+            get_tf_vectors(query_postings, query)
+        )
+    return query_vector, book_vector
+
+def get_tfidf_vectors(query_postings, query):
+    new_query = {}
+    for posting in query_postings:
+        token_name = posting.token.name
+        new_query[token_name] = query[token_name] * posting.token.idf
+
+    # Get vector of query ordered by token name
+    query_vector = [x[1] for x in sorted(new_query.items())]
+    book_vector = [
+        x.tfidf for x in query_postings.order_by('token__name')
+    ]
+    return query_vector, book_vector
+
+def get_tf_vectors(query_postings, query):
+    book_vector = query_postings.order_by(
+        'token__name'
+    ).values_list('tf', flat=True)
+    query_vector = [x[1] for x in sorted(query.items()) if x[1] in book_vector]
+    return query_vector, book_vector

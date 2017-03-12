@@ -9,6 +9,11 @@ DISTANCE_METRICS = (
     ("3", "Pearson Correlation"),
     ("4", "Euclidean Distance"),
 )
+VECTOR_TRANSFORMATIONS = (
+    ("0", "TF-IDF"),
+    ("1", "No Transformation"),
+    ("2", "Binary"),
+)
 
 class QueryForm(forms.Form):
 
@@ -18,6 +23,13 @@ class QueryForm(forms.Form):
         initial="0",
         widget=forms.Select,
         label="Distance Metric",
+        required=True
+    )
+    transformation = forms.ChoiceField(
+        choices=VECTOR_TRANSFORMATIONS,
+        initial="0",
+        widget=forms.Select,
+        label="Vector Transformation",
         required=True
     )
 
@@ -33,5 +45,12 @@ class RecommendForm(forms.Form):
         initial="0",
         widget=forms.Select,
         label="Distance Metric",
+        required=True
+    )
+    transformation = forms.ChoiceField(
+        choices=VECTOR_TRANSFORMATIONS,
+        initial="0",
+        widget=forms.Select,
+        label="Vector Transformation",
         required=True
     )
