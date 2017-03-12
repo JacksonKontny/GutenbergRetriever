@@ -246,7 +246,7 @@ def get_transformed_vector(query_postings, query, transformation):
         query_vector, book_vector = get_tfidf_vectors(
             query_postings, query
         )
-    if transformation == 'binary':
+    elif transformation == 'binary':
         query_vector, book_vector = (
             get_binary_vectors(query_postings, query)
         )
