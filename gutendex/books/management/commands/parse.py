@@ -17,19 +17,7 @@ class Command(BaseCommand):
             pk = book.pk
 
             counter = utils.get_word_count(text)
+            utils.create_postings(book, counter)
 
-            for word, count in counter.items():
-                token, created = models.Token.objects.get_or_create(
-                    name=word
-                )
-                token.total_occurances += count
-                token.df += 1
-                token.save()
-
-                models.Posting.objects.create(
-                    book=book,
-                    token=token,
-                    tf = count,
-                )
             book.is_parsed = True
             book.save()

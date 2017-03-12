@@ -103,25 +103,28 @@ class SubjectViewSet(viewsets.ModelViewSet):
     queryset = Subject.objects.all().order_by('name')
     serializer_class = SubjectSerializer
 
-def get_ranked_books(query, distance_metric):
+def get_ranked_books(query, distance_metric, transformation):
     metric_mapping = {
         '0': 'cosine_distance',
         '1': 'jaccard_distance',
         '2': 'dice_coefficient',
-        '3': 'pearson_correlation',
-        '4': 'euclidean_distance',
+    }
+    transformation_mapping = {
+        '0': 'tfidf',
+        '1': '', # No tranformation
+        '2': 'binary',
     }
     counter = utils.get_word_count(query)
-    postings = Posting.objects.filter(token__name__in=counter.keys())
 
     # only get books that have at least one of the terms queried
-    books = Book.objects.filter(posting__in=postings)
+    books = Book.objects.filter(tokens__name__in=counter.keys())
 
     # get distance metric for every book
     rated_books = [
         (
             book.pk,
-            getattr(book, metric_mapping[distance_metric])(counter) # calls book.<distance_metric>, which could be cosine, jaccard, or dice
+            getattr(book, metric_mapping[distance_metric])(counter),
+            transformation_mapping[transformation] # calls book.<distance_metric>, which could be cosine, jaccard, or dice
          ) for book in books
     ]
 
@@ -174,7 +177,12 @@ class QueryView(View):
         if form.is_valid():
             query = form.cleaned_data['query']
             distance_metric = form.cleaned_data['distance_metric']
-            relevant_books = get_ranked_books(query, distance_metric)
+            transformation = form.cleaned_data['transformation']
+            relevant_books = get_ranked_books(
+                query,
+                distance_metric,
+                transformation
+            )
             self.request.session['books'] = relevant_books
             return HttpResponseRedirect(
                 reverse('books:ranked-list')

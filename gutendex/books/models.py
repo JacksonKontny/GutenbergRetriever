@@ -1,7 +1,12 @@
 from collections import OrderedDict
 from django.db import models
 
+<<<<<<< HEAD
 import math
+=======
+from scipy.spatial.distance import cosine, jaccard, dice
+
+>>>>>>> book_rec
 from books import utils
 
 
@@ -83,21 +88,23 @@ class Book(models.Model):
             dot_product += posting.tf * query[posting.token.name]
         return dot_product
 
-    def cosine_distance(self, query, transformation=None):
+    def cosine_distance(self, query, transformation='tfidf'):
         """ Return the cosine distance between a query and the book's term
             frequency vector.
 
             Dices coefficient is two times the dot product of the query and the
             book divided by the sum of the squared terms of each book
         """
-
-        return 1 - (
-            self.query_dot_product(query, transformation=transformation)
-            /
-            self.magnitude * utils.get_magnitude(query.values())
+        query_postings = self.posting_set.filter(
+            token__name__in=query.keys()
+        )
+        query_vector, book_vector = utils.get_transformed_vector(
+            query_postings, query, transformation
         )
 
-    def jaccard_distance(self, query, transformation=None):
+        return 1 - cosine(query_vector, book_vector)
+
+    def jaccard_distance(self, query, transformation='tfidf'):
         """ Return the jaccard distance between a query and the book's term
             frequency vector.
 
@@ -110,14 +117,15 @@ class Book(models.Model):
             /
             ((sum of book squared terms + sum of query squared terms) - dot(query, book))
         """
-        dot_product = self.query_dot_product(query, transformation=transformation)
-        return 1 - (
-            dot_product
-            /
-            self.sum_of_squares + utils.get_sum_of_squares(query.values()) - dot_product
+        query_postings = self.posting_set.filter(
+            token__name__in=query.keys()
         )
+        query_vector, book_vector = utils.get_transformed_vector(
+            query_postings, query, transformation
+        )
+        return 1 - jaccard(query_vector, book_vector)
 
-    def dice_coefficient(self, query, transformation=None):
+    def dice_coefficient(self, query, transformation='tfidf'):
         """ Return the dice coefficient between a query and the book's term
             frequency vector.
 
@@ -129,12 +137,13 @@ class Book(models.Model):
             /
             (sum of book squared terms + sum of query squared terms)
         """
-        dot_product = self.query_dot_product(query, transformation=transformation)
-        return 1 - (
-            2 * dot_product
-            /
-            self.sum_of_squares + utils.get_sum_of_squares(query.values())
+        query_postings = self.posting_set.filter(
+            token__name__in=query.keys()
         )
+        query_vector, book_vector = utils.get_transformed_vector(
+            query_postings, query, transformation
+        )
+        return 1 - dice(query_vector, book_vector)
 
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)
