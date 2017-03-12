@@ -220,6 +220,9 @@ class DistanceType(models.Model):
     code = models.CharField(max_length=64)
     name = models.CharField(max_length=64)
 
+    def __str__(self):
+        return self.name
+
 class Euclidean(models.Model):
     book_1 = models.ForeignKey('Book', related_name='book1_euc+')
     book_2 = models.ForeignKey('Book', related_name='book2_euc+')

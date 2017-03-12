@@ -29,9 +29,9 @@ def _db_handle(*args, **options):
             book_j = models.Book.objects.get(pk=j)
             pearson_distance = 1 - pearsonr(book_i_vector, book_j_vector)[0]
             euclidean_distance = euclidean(book_i_vector, book_j_vector)
-            cosine_distance = 1 - cosine(book_i_vector, book_j_vector)
-            jaccard_distance = 1 - jaccard(book_i_vector, book_j_vector)
-            dice_distance = 1 - dice(book_i_vector, book_j_vector)
+            cosine_distance = cosine(book_i_vector, book_j_vector)
+            jaccard_distance = jaccard(book_i_vector, book_j_vector)
+            dice_distance = dice(book_i_vector, book_j_vector)
             euclidean_type = models.DistanceType.objects.get(
                 code=models.DistanceType.EUCLIDEAN
             )

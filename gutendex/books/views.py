@@ -149,11 +149,16 @@ class RecommendView(View):
         form = self.form_class(self.request.POST)
         if form.is_valid():
             book = form.cleaned_data['book']
-            top_correlations = (
-                Correlation.objects.filter(book_1=book).order_by('distance')
+            distance_type = form.cleaned_data['distance_type']
+            import ipdb; ipdb.set_trace()
+            closest = (
+                Distance.objects.filter(
+                    book_1=book,
+                    distance_type=distance_type,
+                ).order_by('distance')
             )[:10]
             relevant_books = [
-                correlation.book_2.pk for correlation in top_correlations
+                distance.book_2.pk for distance in closest
             ]
             self.request.session['books'] = relevant_books
             return HttpResponseRedirect(
