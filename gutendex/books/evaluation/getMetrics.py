@@ -15,7 +15,7 @@ def get(f1, f2 = 'Time_REL.csv'):
     groundTruth = open(f2, 'r').readlines() # each line represents a list of relevant docs
     retrieved = open(f1, 'r').readlines()   # each line represents a list of retrieved docs
 
-    for i in range(1): # number of queries
+    for i in range(len(groundTruth)-1): # number of queries
         precision = []
         recall = []
         f_measure = []
@@ -84,6 +84,7 @@ if __name__ == '__main__':
     files = os.listdir(os.getcwd())
     for file in files:
         if not file.startswith("__") and not file.endswith(".py") \
-                and file != 'Time_REL.csv' and not file.startswith("Evals_"):
+                and file != 'Time_REL.csv' and not file.startswith("Evals_")\
+                and not file.startswith('.'):
             get(file)
 
