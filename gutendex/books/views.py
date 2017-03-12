@@ -154,7 +154,7 @@ class RecommendView(View):
                 Distance.objects.filter(
                     book_1=book,
                     distance_type=distance_type,
-                ).order_by('distance').values_list('book_2__pk')
+                ).order_by('distance').values_list('book_2__pk', flat=True)
             )[:10]
             self.request.session['books'] = relevant_books
             return HttpResponseRedirect(
