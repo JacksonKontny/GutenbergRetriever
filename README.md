@@ -1,6 +1,8 @@
 Gutenberg Retriever
 ==============
 
+It is probably best to view this readme from the [github repo](https://github.com/JacksonKontny/GutenbergRetriever)
+
 This project is a prototype information retrieval system and item based recommender system for
 books hosted on Project Gutenberg.  It builds off the work of two open source projects, the
 [gutendex django project](https://github.com/garethbjohnson/gutendex), and the 
