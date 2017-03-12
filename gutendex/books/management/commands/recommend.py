@@ -68,7 +68,8 @@ def _db_handle(*args, **options):
             models.Distance.objects.update_or_create(
                 book_1=book_i,
                 book_2=book_j,
-                distance_type=cosine_type
+                distance_type=cosine_type,
+                defaults={'distance': cosine_distance},
             )
             models.Distance.objects.update_or_create(
                 book_1=book_j,
