@@ -117,7 +117,7 @@ def get_ranked_books(query, distance_metric, transformation, limit=10):
     counter = utils.get_word_count(query)
 
     # only get books that have at least one of the terms queried
-    books = Book.objects.filter(tokens__name__in=counter.keys())
+    books = Book.objects.filter(tokens__name__in=counter.keys()).distinct()
 
     # get distance metric for every book
     rated_books = [
