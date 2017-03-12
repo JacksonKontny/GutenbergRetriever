@@ -150,16 +150,12 @@ class RecommendView(View):
         if form.is_valid():
             book = form.cleaned_data['book']
             distance_type = form.cleaned_data['distance_type']
-            import ipdb; ipdb.set_trace()
-            closest = (
+            relevant_books = list(
                 Distance.objects.filter(
                     book_1=book,
                     distance_type=distance_type,
-                ).order_by('distance')
+                ).order_by('distance').values_list('book_2__pk')
             )[:10]
-            relevant_books = [
-                distance.book_2.pk for distance in closest
-            ]
             self.request.session['books'] = relevant_books
             return HttpResponseRedirect(
                 reverse('books:ranked-list')
@@ -200,10 +196,14 @@ class ListView(View):
     template_name = 'ranked-list.html'
 
     def get(self, request, *args, **kwargs):
+        book_list = []
+        for book_pk in request.session['books']:
+            book_list.append(Book.objects.get(pk=book_pk))
+
         return render(
             request,
             self.template_name,
-            {'books': Book.objects.filter(pk__in=self.request.session['books'])},
+            {'books': book_list},
         )
 
 class DetailView(View):
