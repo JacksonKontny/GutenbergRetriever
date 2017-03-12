@@ -17,8 +17,6 @@ class Command(BaseCommand):
             models.Token.objects.all().delete()
             for line in lines:
                 if line.startswith('*TEXT'):
-                    doc_name = line
-                    doc_number += 1
                     if book_lines:
                         text = '\n'.join(book_lines)
                         book, _ = models.Book.objects.update_or_create(
@@ -30,6 +28,10 @@ class Command(BaseCommand):
                         utils.create_postings(book, counter)
                         book.is_parsed=True
                         book.save()
+                    book_lines = []
+                    doc_name = line
+                    doc_number += 1
+                    print(doc_number)
                 else:
                     if '*STOP' not in line:
                         book_lines.append(line)
