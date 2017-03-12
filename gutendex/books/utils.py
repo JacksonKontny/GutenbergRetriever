@@ -5,7 +5,7 @@ import re
 import string
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-from collections import Counter
+from collections import Counter, OrderedDict
 from decimal import Decimal
 
 from books import models
@@ -235,10 +235,10 @@ def create_postings(book, counter):
         token.df += 1
         token.save()
 
-        models.Posting.objects.create(
+        models.Posting.objects.update_or_create(
             book=book,
             token=token,
-            tf = count,
+            defaults={'tf': count},
         )
 
 def get_transformed_vector(query_postings, query, transformation):
