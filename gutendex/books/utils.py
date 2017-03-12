@@ -246,6 +246,11 @@ def get_transformed_vector(query_postings, query, transformation):
         query_vector, book_vector = get_tfidf_vectors(
             query_postings, query
         )
+    if transformation == 'binary':
+        query_vector, book_vector = (
+            get_binary_vectors(query_postings, query)
+        )
+
     else:
         query_vector, book_vector = (
             get_tf_vectors(query_postings, query)
@@ -270,4 +275,9 @@ def get_tf_vectors(query_postings, query):
         'token__name'
     ).values_list('tf', flat=True)
     query_vector = [x[1] for x in sorted(query.items()) if x[1] in book_vector]
+    return query_vector, book_vector
+
+def get_binary_vectors(query_postings, _):
+    book_vector_length = query_postings.count()
+    book_vector, query_vector = [1] * book_vector_length
     return query_vector, book_vector
