@@ -94,3 +94,8 @@ python manage.py evaluation
 
 The predictions will be output in several csv files from which you can perform any analysis, comparing the results to those
 found in gutendex/books/evaluation/time/TIME.REL
+
+DEMO
+----
+
+[![DEMO VIDEO](https://img.youtube.com/vi/t2l4OiglwIY/0.jpg)](https://www.youtube.com/watch?v=t2l4OiglwIY)
