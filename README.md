@@ -30,7 +30,7 @@ DISCLAIMER: All of the commands take a long time. If you wish to speed the proce
 modify BOOK_COUNT in gutendex/books/management/commands/updatebooks.py to a small number.  You will
 pull fewer books, but will be able to demo the project with a small(er) sacrifice of your time.
 
-At present, Project Gutenberg offers over 500,000 books on its website.  The open source
+At present, Project Gutenberg offers over 53,000 books on its website.  The open source
 gutendex project made it easy to pull the catalog information for Project Gutenberg, but
 did not pull the text of the books, or clean the legal information.  We borrowed some
 code from the python gutenberg library to help with this.  The code for pulling actual
