@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -134,7 +135,7 @@ def get_ranked_books(query, distance_metric, transformation, limit=10):
 
     return [rank_tuple[0] for rank_tuple in ranked_books][:limit]
 
-class RecommendView(View):
+class RecommendView(LoginRequiredMixin, View):
     form_class = RecommendForm
     template_name = 'recommend.html'
 
@@ -163,7 +164,7 @@ class RecommendView(View):
         else:
             return self.get(request, *args, **kwargs)
 
-class QueryView(View):
+class QueryView(LoginRequiredMixin, View):
     form_class = QueryForm
     template_name = 'query.html'
 
@@ -192,7 +193,7 @@ class QueryView(View):
         else:
             return self.get(request, *args, **kwargs)
 
-class ListView(View):
+class ListView(LoginRequiredMixin, View):
     template_name = 'ranked-list.html'
 
     def get(self, request, *args, **kwargs):
@@ -206,7 +207,7 @@ class ListView(View):
             {'books': book_list},
         )
 
-class DetailView(View):
+class DetailView(LoginRequiredMixin, View):
     template_name = 'book-text.html'
 
     def get(self, request, pk, *args, **kwargs):
