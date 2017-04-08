@@ -1,7 +1,9 @@
-{% block nav-home %}<a href="{% url 'books:query' %}">Home</a>{% endblock %}
+{% extends 'base.html' %}
 
+{% block content %}
 {% for book in books %}
-<li><a href="{% url 'books:text' pk=book.pk %}">
-        {{ book.title }}
-    </a></li>
+<a href="{% url 'books:text' pk=book.pk %}">
+    {{ book.title }}
+</a></br>
 {% endfor %}
+{% endblock %}

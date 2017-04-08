@@ -1,1 +1,15 @@
-<pre>{{ text }}</pre>
+<style>
+div.textContainer pre {
+    display: inline-block;
+    text-align: left;
+}
+</style>
+{% extends 'base.html' %}
+
+{% block content %}
+<div align='center'>
+  <div class="textContainer">
+    <pre>{{ text }}</pre>
+  </div>
+</div>
+{% endblock %}

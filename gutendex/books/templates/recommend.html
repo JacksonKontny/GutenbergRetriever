@@ -1,3 +1,12 @@
+{% extends "base.html" %}
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block jumbotron %}
 {% if form.errors %}
     <ol>
     {% for error in form.errors %}
@@ -7,6 +16,10 @@
 {% endif %}
 <form action={% url "books:recommend" %} method="post">
     {% csrf_token %}
-    {{ form }}
+    {% bootstrap_form form %}
     <input type="submit" value="Submit" />
 </form>
+
+{% endblock %}
+{% block footer %}
+{% endblock %}
