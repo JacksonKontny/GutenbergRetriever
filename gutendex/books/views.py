@@ -193,6 +193,16 @@ class QueryView(LoginRequiredMixin, View):
         else:
             return self.get(request, *args, **kwargs)
 
+
+class SearchView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            self.template_name,
+            {'form': self.form_class()},
+        )
+
 class ListView(LoginRequiredMixin, View):
     template_name = 'ranked-list.html'
 
