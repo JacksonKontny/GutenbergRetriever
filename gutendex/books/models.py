@@ -30,6 +30,7 @@ class Book(models.Model):
     title = models.CharField(blank=True, max_length=1024, null=True)
     text = models.TextField(blank=True)
     is_parsed = models.BooleanField(default=False)
+    has_word_vector = models.BooleanField(default=False)
     tokens = models.ManyToManyField('Token', through='Posting')
     distance = models.ManyToManyField('self', through='Distance',
                                            symmetrical=False,
@@ -157,7 +158,10 @@ class Book(models.Model):
         return Format.objects.filter(book_id=self.id)
 
     def __str__(self):
-        return self.title
+        if self.title:
+            return self.title
+        else:
+            return 'No Title'
 
 
 class Bookshelf(models.Model):
@@ -200,6 +204,20 @@ class Posting(models.Model):
             ('book', 'token'),
         )
 
+class WordPosting(models.Model):
+    book = models.ForeignKey('Book')
+    word = models.ForeignKey('Word')
+    tf = models.PositiveIntegerField(default=0)
+
+    @property
+    def tfidf(self):
+        return self.tf * self.token.idf
+
+    class Meta:
+        unique_together = (
+            ('book', 'word'),
+        )
+
 class Token(models.Model):
     name = models.CharField(max_length=128, unique=True)
     df = models.PositiveIntegerField(default=0)
@@ -210,7 +228,37 @@ class Token(models.Model):
         return math.log(Book.objects.count() / self.df, 2)
 
     def __str__(self):
-        return self.name
+        if self.name:
+            name = self.name
+        else:
+            name = 'None'
+        return 'Token: {}'.format(name)
+
+class Word(models.Model):
+    name = models.CharField(max_length=128, unique=True)
+    df = models.PositiveIntegerField(default=0)
+    total_occurances = models.PositiveIntegerField(default=0)
+
+    @property
+    def idf(self):
+        return math.log(Book.objects.count() / self.df, 2)
+
+    def __str__(self):
+        if self.name:
+            name = self.name
+        else:
+            name = 'None'
+        return 'Word: {}'.format(name)
+
+
+class Sentence(models.Model):
+    book = models.ForeignKey('Book')
+    index = models.PositiveIntegerField()
+    compound = models.FloatField(default=0)
+    pos = models.FloatField(default=0)
+    neg = models.FloatField(default=0)
+    neu = models.FloatField(default=0)
+
 
 class Distance(models.Model):
     book_1 = models.ForeignKey('Book', related_name='book1_distance+')

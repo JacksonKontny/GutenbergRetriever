@@ -137,13 +137,15 @@ def safe_unicode(arg, *args, **kwargs):
     """ Coerce argument to Unicode if it's not already """
     return arg if isinstance(arg, str) else str(arg, *args, **kwargs)
 
-def get_word_count(text):
+def get_word_count(text, stem=True):
     stop_words = set(stopwords.words("english"))
     ps = PorterStemmer()
     for punc in string.punctuation:
         text = text.replace(punc, ' ')
 
     words = text.strip().split()
+    if not stem:
+        return Counter(words)
 
     stemmed_words = []
     for w in words:
@@ -220,26 +222,39 @@ def get_sparse_vector(postings_list):
         vector for all tokens
     """
     sparse_dict = OrderedDict(
-        zip(Token.objects.values_list('pk', flat=True),
-            [0]*Token.objects.count())
+        zip(models.Token.objects.values_list('pk', flat=True),
+            [0]*models.Token.objects.count())
     )
     for pk, value in postings_list.iteritems():
         sparse_dict[pk] = value
 
-def create_postings(book, counter):
+def create_postings(book, counter, tokenized=True):
     for word, count in counter.items():
-        token, created = models.Token.objects.get_or_create(
-            name=word
-        )
+        if not tokenized:
+            token, created = models.Word.objects.get_or_create(
+                name=word
+            )
+        else:
+            token, created = models.Token.objects.get_or_create(
+                name=word
+            )
         token.total_occurances += count
         token.df += 1
         token.save()
 
-        models.Posting.objects.update_or_create(
-            book=book,
-            token=token,
-            defaults={'tf': count},
-        )
+        if tokenized:
+            models.Posting.objects.update_or_create(
+                book=book,
+                token=token,
+                defaults={'tf': count},
+            )
+        else:
+            models.WordPosting.objects.update_or_create(
+                book=book,
+                word=token,
+                defaults={'tf': count},
+            )
+
 
 def get_transformed_vector(query_postings, query, transformation):
     if transformation == 'tfidf':
