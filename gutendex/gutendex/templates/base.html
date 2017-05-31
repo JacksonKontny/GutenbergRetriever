@@ -47,8 +47,8 @@
         <nav>
           <ul class="nav nav-pills pull-right">
             <li role="presentation"><a href="{% url 'home' %}">Home</a></li>
-            <li role="presentation"><a href="{% url 'books:query' %}">Search Books</a></li>
-            <li role="presentation"><a href="{% url 'books:recommend' %}">Rec Books</a></li>
+            <li role="presentation"><a href="{% url 'books:query' %}">Rate Books By Text</a></li>
+            <li role="presentation"><a href="{% url 'books:recommend' %}">Rate Books By Title</a></li>
             {% if user.is_authenticated %}
                 <li role="presentation"><a href={% url "logout" %}>Logout</a></li>
             {% else %}

@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
+from django.views.generic import TemplateView
 from django.urls import reverse
 
 from rest_framework import viewsets
@@ -13,7 +14,7 @@ from books import utils
 
 from .models import *
 from .serializers import *
-from .forms import QueryForm, RecommendForm
+from .forms import QueryForm, RecommendForm, RatingForm
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -221,8 +222,30 @@ class DetailView(LoginRequiredMixin, View):
     template_name = 'book-text.html'
 
     def get(self, request, pk, *args, **kwargs):
+        book = Book.objects.get(pk=pk)
+        rating = BookRating.objects.filter(
+            book=book, user=request.user
+        ).first()
+        if rating:
+            rating_form = RatingForm({'rating': rating.rating})
+        else:
+            rating_form = RatingForm()
+
         return render(
             request,
             self.template_name,
-            {'text': Book.objects.get(pk=pk).text}
+            {'book': book,
+             'rating_form': rating_form}
         )
+
+    def post(self, request, pk, *args, **kwargs):
+        rating_form = RatingForm(request.POST)
+        if rating_form.is_valid():
+            book = Book.objects.get(pk=pk)
+            user = request.user
+            BookRating.objects.update_or_create(
+                book=book,
+                user=user,
+                defaults={'rating': rating_form.cleaned_data['rating']}
+            )
+        return self.get(request, pk, *args, **kwargs)

@@ -5,11 +5,32 @@ div.textContainer pre {
 }
 </style>
 {% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 
 {% block content %}
+
+{% if form.errors %}
+    <ol>
+    {% for error in form.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+    {% endfor %}
+    </ol>
+{% endif %}
+<form action={% url "books:text" pk=book.pk %} method="post">
+    {% csrf_token %}
+    <table>
+    {% bootstrap_form rating_form %}
+    </table>
+    <input type="submit" value="Submit" />
+</form>
+
 <div align='center'>
   <div class="textContainer">
-    <pre>{{ text }}</pre>
+    <pre>{{ book.text }}</pre>
   </div>
 </div>
 {% endblock %}

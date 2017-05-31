@@ -1,7 +1,10 @@
 from collections import OrderedDict
-from django.db import models
 
 import math
+
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models
 
 from scipy.spatial.distance import cosine, jaccard, dice
 
@@ -248,3 +251,7 @@ class Correlation(models.Model):
     book_2 = models.ForeignKey('Book', related_name='book2_corr+')
     distance = models.FloatField(default=0)
 
+class BookRating(models.Model):
+    book = models.ForeignKey('Book')
+    user = models.ForeignKey(User)
+    rating = models.SmallIntegerField()
