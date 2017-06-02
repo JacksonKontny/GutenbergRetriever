@@ -289,6 +289,21 @@ class DistanceType(models.Model):
     def __str__(self):
         return self.name
 
+class Cluster(models.Model):
+    POLARITY = 'polarity'
+    TOKENS = 'tokens'
+    WORDS = 'words'
+
+    book = models.ForeignKey('Book')
+    n_clusters = models.SmallIntegerField()
+    n = models.SmallIntegerField()
+    clustered_on = models.CharField(max_length=64)
+
+    class Meta:
+        unique_together = (
+            ('book', 'n_clusters', 'clustered_on'),
+        )
+
 class Euclidean(models.Model):
     book_1 = models.ForeignKey('Book', related_name='book1_euc+')
     book_2 = models.ForeignKey('Book', related_name='book2_euc+')

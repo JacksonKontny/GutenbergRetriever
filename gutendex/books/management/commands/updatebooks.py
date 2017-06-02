@@ -35,7 +35,7 @@ def _format_download_uri(etextno):
         UnknownDownloadUri: If no download location can be found for the text.
 
     """
-    uri_root = r'http://www.gutenberg.lib.md.us'
+    uri_root = r'http://aleph.gutenberg.org'
     extensions = ('.txt', '-8.txt', '-0.txt')
     for extension in extensions:
         path = _etextno_to_uri_subdirectory(etextno)
