@@ -5,6 +5,7 @@ import math
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.db.models import Avg, Count
 
 from scipy.spatial.distance import cosine, jaccard, dice
 
@@ -169,6 +170,22 @@ class Book(models.Model):
 
     def get_formats(self):
         return Format.objects.filter(book_id=self.id)
+
+    @property
+    def possitivity(self):
+        return self.sentence_set.aggregate(value=Avg('pos'))['value']
+
+    @property
+    def negativity(self):
+        return self.sentence_set.aggregate(value=Avg('neg'))['value']
+
+    @property
+    def neutrality(self):
+        return self.sentence_set.aggregate(value=Avg('neu'))['value']
+
+    @property
+    def compound(self):
+        return self.sentence_set.aggregate(value=Avg('compound'))['value']
 
     def __str__(self):
         if self.title:

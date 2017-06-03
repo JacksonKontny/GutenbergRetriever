@@ -207,10 +207,24 @@ class SearchView(LoginRequiredMixin, View):
 class ListView(LoginRequiredMixin, View):
     template_name = 'ranked-list.html'
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, pk=None, method=None, *args, **kwargs):
         book_list = []
-        for book_pk in request.session['books']:
-            book_list.append(Book.objects.get(pk=book_pk))
+        if not pk and not method:
+            for book_pk in request.session['books']:
+                book_list.append(Book.objects.get(pk=book_pk))
+        else:
+            n = Cluster.objects.get(
+                n_clusters=2,
+                book__pk=pk,
+                clustered_on=method
+            ).n
+            book_list = list(
+                Book.objects.filter(
+                    cluster__n_clusters=2,
+                    cluster__clustered_on=method,
+                    cluster__n=n
+                )
+            )
 
         return render(
             request,

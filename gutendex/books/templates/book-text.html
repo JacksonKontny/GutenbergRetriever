@@ -27,10 +27,55 @@ div.textContainer pre {
     </table>
     <input type="submit" value="Submit" />
 </form>
-
 <div align='center'>
+  <div class="textContainer">
+      <div class="row">
+          <h4>Book Polarity</h4>
+      </div>
+      <div class="row">
+          <div class="col-md-3">
+              <h5>Positivity</h5>
+              {{book.possitivity}}
+          </div>
+          <div class="col-md-3">
+              <h5>Negativity</h5>
+              {{book.negativity}}
+          </div>
+          <div class="col-md-3">
+              <h5>Neutrality</h5>
+              {{book.neutrality}}
+          </div>
+          <div class="col-md-3">
+              <h5>Compound</h5>
+              {{book.compound}}
+          </div>
+      </div>
+      <div class="row">
+      </div>
+      <div class="row">
+          <h4>See Other Books Like This</h4>
+      </div>
+      <div class="row">
+          <div class="col-md-4">
+              <a href="{% url "books:ranked-list" pk=book.pk method='words' %}">Clustered by Words</a>
+          </div>
+          <div class="col-md-4">
+              <a href="{% url "books:ranked-list" pk=book.pk method='tokens' %}">Clustered by Tokens</a>
+          </div>
+          <div class="col-md-4">
+              <a href="{% url "books:ranked-list" pk=book.pk method='polarity' %}">Clustered by Polarity</a>
+          </div>
+      </div>
+      <div class="row">
+      </div>
+  </div>
+
+  <div class="row">
+      <h4>Read</h4>
+  </div>
   <div class="textContainer">
     <pre>{{ book.text }}</pre>
   </div>
 </div>
+
 {% endblock %}
