@@ -77,7 +77,7 @@ class Command(BaseCommand):
                 book.average_compound
             ]
             category = set(SUBCATEGORIES) & set(
-                book.subjects.exclude(name__in=CATEGORIES).values_list(
+                book.subjects.exclude(name__in=SUBCATEGORIES).values_list(
                     'name', flat=True
                 )
             )
@@ -89,21 +89,21 @@ class Command(BaseCommand):
         category_token_df = pd.DataFrame(category_token_doc)
         category_sentiment_df = pd.DataFrame(category_sentiment_doc)
 
-        subcategory_word_df = pd.DataFrame(subcategory_word_doc)
-        subcategory_token_df = pd.DataFrame(subcategory_token_doc)
-        subcategory_sentiment_df = pd.DataFrame(subcategory_sentiment_doc)
-
         category_word_df = category_word_df.T
         category_token_df = category_token_df.T
         category_sentiment_df = category_sentiment_df.T
 
-        subcategory_word_df = subcategory_word_df.T
-        subcategory_token_df = subcategory_token_df.T
-        subcategory_sentiment_df = subcategory_sentiment_df.T
-
         category_word_df.to_csv('output/category_word_tfidf.csv')
         category_token_df.to_csv('output/category_token_tfidf.csv')
         category_sentiment_df.to_csv('output/category_sentiment_tfidf.csv')
+
+        subcategory_word_df = pd.DataFrame(subcategory_word_doc)
+        subcategory_token_df = pd.DataFrame(subcategory_token_doc)
+        subcategory_sentiment_df = pd.DataFrame(subcategory_sentiment_doc)
+
+        subcategory_word_df = subcategory_word_df.T
+        subcategory_token_df = subcategory_token_df.T
+        subcategory_sentiment_df = subcategory_sentiment_df.T
 
         subcategory_word_df.to_csv('output/subcategory_word_tfidf.csv')
         subcategory_token_df.to_csv('output/subcategory_token_tfidf.csv')

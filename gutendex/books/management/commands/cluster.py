@@ -25,7 +25,7 @@ def _db_handle(*args, **options):
             'tokens',
             queryset=models.Posting.objects.select_related('token')
         )
-    )[:3]
+    )
     tfidf_dict = {}
     tfidf_word_dict = {}
     polarity_dict = {}
@@ -53,12 +53,13 @@ def _db_handle(*args, **options):
     sparse_word_matrix = sparse_word_matrix.T
 
     polarity_matrix = pd.DataFrame(tfidf_word_dict)
+    polarity_matrix = polarity_matrix.T
     for matrix, cluster_type in [
         (sparse_matrix, models.Cluster.TOKENS),
         (sparse_word_matrix, models.Cluster.WORDS),
         (polarity_matrix, models.Cluster.POLARITY),
     ]:
-        for n_clusters in [2]:# , 5, 10, 20]:
+        for n_clusters in [2, 5, 10, 20]:
             kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(matrix)
             for idx, label in enumerate(kmeans.labels_):
                 book_pk = int(matrix.index[idx])
