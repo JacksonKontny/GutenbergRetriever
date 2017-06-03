@@ -53,7 +53,7 @@ class Command(BaseCommand):
             print('getting text for {}:'.format(category))
             self._get_category_etext(category, CATEGORIES)
         for subcategory in SUBCATEGORIES:
-            print('getting text for {}:'.format(category))
+            print('getting text for {}:'.format(subcategory))
             self._get_category_etext(subcategory, SUBCATEGORIES)
 
     def _get_category_etext(self, category, categories):

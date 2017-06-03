@@ -18,7 +18,7 @@ class Command(BaseCommand):
         print(books.count())
         for idx, book in enumerate(books):
             print(idx, book.title)
-            text = book.title
+            text = book.text
             pk = book.pk
 
             counter = utils.get_word_count(text, stem=False)

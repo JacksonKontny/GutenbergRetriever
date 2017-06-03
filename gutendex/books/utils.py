@@ -143,9 +143,10 @@ def get_word_count(text, stem=True):
     for punc in string.punctuation:
         text = text.replace(punc, ' ')
 
-    words = text.strip().split()
     if not stem:
+        words = text.lower().strip().split()
         return Counter(words)
+    words = text.strip().split()
 
     stemmed_words = []
     for w in words:

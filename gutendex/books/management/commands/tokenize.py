@@ -8,11 +8,14 @@ class Command(BaseCommand):
     help = 'This replaces the catalog files with the latest ones.'
 
     def handle(self, *args, **options):
-        for book in models.Book.objects.filter(
+        books = models.Book.objects.filter(
             is_parsed=False,
         ).exclude(
             text=''
-        ):
+        )
+        print(books.count())
+        for idx, book in enumerate(books):
+            print(idx, book.title)
             text = book.text
             pk = book.pk
 

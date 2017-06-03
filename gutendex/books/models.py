@@ -50,6 +50,19 @@ class Book(models.Model):
         return [x[1] for x in sparse_dict.items()]
 
     @property
+    def sparse_word_tfidf_vector(self):
+        """ Return this book's sparse non tokenized term frequency vector
+        """
+        sparse_dict = OrderedDict(
+            zip(Word.objects.values_list('pk', flat=True),
+                [0]*Word.objects.count())
+        )
+        for word_posting in self.wordposting_set.all().select_related('word'):
+            sparse_dict[word_posting.word.pk] = word_posting.tfidf
+
+        return [x[1] for x in sparse_dict.items()]
+
+    @property
     def tfidf_dict(self):
         """ Return this book's sparse term frequency vector
         """
@@ -211,7 +224,7 @@ class WordPosting(models.Model):
 
     @property
     def tfidf(self):
-        return self.tf * self.token.idf
+        return self.tf * self.word.idf
 
     class Meta:
         unique_together = (

@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.db.models import Count
 from nltk import tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
@@ -10,8 +11,10 @@ class Command(BaseCommand):
     help = 'This replaces the catalog files with the latest ones.'
 
     def handle(self, *args, **options):
-        books = models.Book.objects.filter(
+        books = models.Book.objects.annotate(sentence_count=Count('sentence')).filter(
             text__isnull=False, title__isnull=False
+        ).filter(
+            sentence_count=0
         ).exclude(
             text='',
         ).exclude(
